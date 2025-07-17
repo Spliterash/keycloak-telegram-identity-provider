@@ -31,6 +31,8 @@ import java.util.Base64;
 @JBossLog
 public class TelegramWebLoginWidgetIdentityProvider extends AbstractIdentityProvider<TelegramWebAuthenticatorConfig> {
     public static final String TG_USER_PHOTO_URL_ATTRIBUTE_NAME = "TELEGRAM_PHOTO_URL";
+    public static final String TG_USER_ID_ATTRIBUTE_NAME = "TELEGRAM_ID";
+
     private final ObjectMapper mapper = new ObjectMapper();
 
     public TelegramWebLoginWidgetIdentityProvider(KeycloakSession session, TelegramWebAuthenticatorConfig config) {
@@ -98,9 +100,10 @@ public class TelegramWebLoginWidgetIdentityProvider extends AbstractIdentityProv
             context.setLastName(telegramAuthData.lastName());
             context.setIdp(self);
             context.setAuthenticationSession(authSession);
-            var photoUrl = telegramAuthData.photoUrl();
             if (photoUrl != null)
-                context.getContextData().put(TG_USER_PHOTO_URL_ATTRIBUTE_NAME, photoUrl);
+                context.setUserAttribute(TG_USER_PHOTO_URL_ATTRIBUTE_NAME, photoUrl);
+
+            context.setUserAttribute(TG_USER_ID_ATTRIBUTE_NAME, telegramAuthData.id());
 
             return callback.authenticated(context);
         }
