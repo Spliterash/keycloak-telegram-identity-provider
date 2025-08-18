@@ -93,7 +93,7 @@ public class TelegramWebLoginWidgetIdentityProvider extends AbstractIdentityProv
             if (!telegramAuthDataValidator.isValid()) return callback.cancelled(authenticatorConfig);
 
             BrokeredIdentityContext context = new BrokeredIdentityContext(telegramAuthData.id(), authenticatorConfig);
-            context.setUsername(telegramAuthData.username());
+            context.setUsername("tg." + telegramAuthData.id());
             context.setFirstName(telegramAuthData.firstName());
             context.setLastName(telegramAuthData.lastName());
             context.setIdp(self);
