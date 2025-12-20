@@ -92,17 +92,29 @@ public class TelegramWebLoginWidgetIdentityProvider extends AbstractIdentityProv
             TelegramAuthDataValidator telegramAuthDataValidator = new TelegramAuthDataValidator(authenticatorConfig, telegramAuthData);
             if (!telegramAuthDataValidator.isValid()) return callback.cancelled(authenticatorConfig);
 
+            BrokeredIdentityContext context = getBrokeredIdentityContext(telegramAuthData, authenticatorConfig, authSession);
+            var photoUrl = telegramAuthData.photoUrl();
+            if (photoUrl != null)
+                context.setUserAttribute(TG_USER_PHOTO_URL_ATTRIBUTE_NAME, photoUrl);
+
+            return callback.authenticated(context);
+        }
+
+        private BrokeredIdentityContext getBrokeredIdentityContext(
+                TelegramAuthData telegramAuthData,
+                TelegramWebAuthenticatorConfig authenticatorConfig,
+                AuthenticationSessionModel authSession
+        ) {
             BrokeredIdentityContext context = new BrokeredIdentityContext(telegramAuthData.id(), authenticatorConfig);
-            context.setUsername(telegramAuthData.username());
+            String username = telegramAuthData.username();
+            if (username == null || username.isBlank())
+                username = "tg." + telegramAuthData.id();
+            context.setUsername(username);
             context.setFirstName(telegramAuthData.firstName());
             context.setLastName(telegramAuthData.lastName());
             context.setIdp(self);
             context.setAuthenticationSession(authSession);
-            var photoUrl = telegramAuthData.photoUrl();
-            if (photoUrl != null)
-                context.getContextData().put(TG_USER_PHOTO_URL_ATTRIBUTE_NAME, photoUrl);
-
-            return callback.authenticated(context);
+            return context;
         }
 
 
